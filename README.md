@@ -42,7 +42,7 @@ rrr [OPTIONS]
 
 ### Install Prebuilt Binaries (recommended)
 TODO: setup build and release github action.
-Grab the prebuilt binary for your OS from the [releases]().
+Grab the prebuilt binary for your OS from the [releases](https://github.com/corysabol/rrr/releases).
 
 ### Install From Source
 Ensure you have Rust installed, then clone the repo, install with `cargo install --path .`.
