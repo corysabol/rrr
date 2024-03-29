@@ -1,5 +1,9 @@
 # rrr (Really Rapid Requestor) 🚀
 
+<p align="center">
+  <img src="./t-rec.gif" alt="rrr in action fetching the cloudflare top 100 domains with the help of the tool httpx."/>
+</p>
+
 rrr is a CLI tool designed to fetch a bunch of URLs rapidly. That's pretty much it. It can save responses to files in a folder, or output them to STDOUT for piping.
 
 ## Features 🌟
@@ -37,8 +41,6 @@ rrr [OPTIONS]
     ```
     cat ranges.txt | daship | httpx | rrr -o | rg "hackme" > interesting.txt
     ```
-
-![rrr in action fetching the cloudflare top 100 domains with the help of the tool httpx.](./t-reg.gif)
 
 ## Get Started 🔥
 
