@@ -33,7 +33,7 @@ rrr [OPTIONS]
     ```
     cat urls.txt | rrr -i 404,403,500 -o > responses.txt
     ```
-- Find interesting responses containing by piping to tools like Ripgrep:
+- Find interesting responses by piping to tools like Ripgrep:
     ```
     cat ranges.txt | daship | httpx | rrr -o | rg "hackme" > interesting.txt
     ```
