@@ -55,7 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let sp = ProgressBar::new_spinner();
     sp.set_style(
-        ProgressStyle::with_template("{spinner:.green} {msg} [{elapsed_precise}]")
+        ProgressStyle::with_template("{spinner:.green} {msg:.green} [{elapsed_precise:.blue}]")
             .unwrap()
             .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ "),
     );
@@ -89,21 +89,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         h.await?;
     }
 
-    sp.set_message(format!(
-        "{} / {} URLs successfully requested!",
-        handles_len.clone() - *error_count.lock().unwrap(),
-        handles_len.clone()
-    ));
-    sp.finish();
+    let msg = if !args.stdout {
+        format!(
+            "{} / {} URLs successfully requested!\nResponses saved in {} directory",
+            handles_len.clone() - *error_count.lock().unwrap(),
+            handles_len.clone(),
+            args.directory,
+        )
+    } else {
+        format!(
+            "{} / {} URLs successfully requested!",
+            handles_len.clone() - *error_count.lock().unwrap(),
+            handles_len.clone()
+        )
+    };
 
-    let error_count = *error_count.lock().unwrap();
-    if error_count > 0 {
-        eprintln!("{} errors / {} URLs", error_count, handles_len);
-    }
-
-    if !args.stdout {
-        eprintln!("Saved responses in {} directory", args.directory);
-    }
+    sp.set_style(ProgressStyle::with_template("{msg:.green} [{elapsed_precise:.blue}]").unwrap());
+    sp.finish_with_message(msg);
 
     Ok(())
 }
