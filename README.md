@@ -40,7 +40,7 @@ rrr [OPTIONS]
 
 ## Get Started 🔥
 
-### Install Fro Prebuilt Binaries (recommended)
+### Install Prebuilt Binaries (recommended)
 TODO: setup build and release github action.
 Grab the prebuilt binary for your OS from the [releases]().
 
