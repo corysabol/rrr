@@ -1,12 +1,11 @@
 use clap::Parser;
-use indicatif::{ProgressBar, ProgressState, ProgressStyle};
+use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::Client;
 use sha2::{Digest, Sha256};
 use std::io::{self, BufRead};
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::time::Duration;
-use std::{cmp::min, fmt::Write};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 
@@ -19,23 +18,28 @@ use tokio::io::AsyncWriteExt;
     cat ranges.txt | httpx | rrr -d responses 
     cat urls.txt | rrr -i 404,403,500 -o > responses.txt
     cat ranges.txt | daship | httpx | rrr -o | rg \"hackme\" > intersting.txt
+    echo 'https://foo.com' | rrr --timeout 1000
     "
 )]
 struct Args {
     /// Optional HTTP method to use for requests
-    #[clap(short, long, default_value = "GET")]
+    #[arg(short, long, default_value = "GET")]
     method: String,
 
+    /// Request timeout value in milliseconds, e.g. 5000 = 5s
+    #[arg(short, long, default_value_t = 5000)]
+    timeout: u64,
+
     /// Optional directory to save response bodies to
-    #[clap(short, long, default_value = "responses")]
+    #[arg(short, long, default_value = "responses")]
     directory: String,
 
     /// Optional list of HTTP response status codes to ignore e.g. 404,403,500
-    #[clap(short, long)]
+    #[arg(short, long)]
     ignore: Option<String>,
 
     /// Print responses to STDOUT
-    #[clap(short = 'o', long, action)]
+    #[arg(short = 'o', long, action)]
     stdout: bool,
 }
 
@@ -76,7 +80,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let ignore_codes = ignore_codes.clone();
         let handle = tokio::spawn(async move {
             if let Err(_) = process_url(&client, &args, &ignore_codes, &url).await {
-                //eprintln!("Error processing {}: {}", url, e);
                 let mut errors = error_counter.lock().unwrap();
                 *errors += 1;
             }
@@ -121,6 +124,7 @@ async fn process_url(
             reqwest::Method::from_bytes(args.method.as_bytes()).unwrap(),
             url,
         )
+        .timeout(Duration::from_millis(args.timeout))
         .send()
         .await?;
 
@@ -145,7 +149,6 @@ async fn process_url(
         let path = std::path::Path::new(&args.directory).join(filename);
         let mut file = File::create(&path).await?;
         file.write_all(body.as_bytes()).await?;
-        //println!("Saved response to {:?}", path);
     }
 
     Ok(())
