@@ -1,8 +1,12 @@
 use clap::Parser;
-use indicatif::ProgressBar;
+use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 use reqwest::Client;
 use sha2::{Digest, Sha256};
 use std::io::{self, BufRead};
+use std::sync::Arc;
+use std::sync::Mutex;
+use std::time::Duration;
+use std::{cmp::min, fmt::Write};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 
@@ -49,29 +53,57 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let stdin = io::stdin();
     let mut handles = Vec::new();
 
+    let sp = ProgressBar::new_spinner();
+    sp.set_style(
+        ProgressStyle::with_template("{spinner:.green} {msg} [{elapsed_precise}]")
+            .unwrap()
+            .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ "),
+    );
+    sp.enable_steady_tick(Duration::from_millis(100));
+
+    let mut line_counter = 0;
+    let error_count = Arc::new(Mutex::new(0));
     for line in stdin.lock().lines() {
+        line_counter += 1;
+
+        let error_counter = Arc::clone(&error_count);
         let url = line?;
+
+        sp.set_message(format!("{} / ? processing {}", line_counter, url.clone()));
 
         let client = client.clone();
         let args = args.clone();
         let ignore_codes = ignore_codes.clone();
-        //if let Err(e) = process_url(&client, &args, &ignore_codes, &url).await {
-        //    eprintln!("Error processing {}: {}", url, e);
-        //};
         let handle = tokio::spawn(async move {
-            if let Err(e) = process_url(&client, &args, &ignore_codes, &url).await {
+            if let Err(_) = process_url(&client, &args, &ignore_codes, &url).await {
                 //eprintln!("Error processing {}: {}", url, e);
+                let mut errors = error_counter.lock().unwrap();
+                *errors += 1;
             }
         });
         handles.push(handle);
     }
 
-    let bar = ProgressBar::new(handles.len().try_into().unwrap());
+    let handles_len = handles.len();
     for h in handles {
         h.await?;
-        bar.inc(1);
     }
-    bar.finish();
+
+    sp.set_message(format!(
+        "{} / {} URLs successfully requested!",
+        handles_len.clone() - *error_count.lock().unwrap(),
+        handles_len.clone()
+    ));
+    sp.finish();
+
+    let error_count = *error_count.lock().unwrap();
+    if error_count > 0 {
+        eprintln!("{} errors / {} URLs", error_count, handles_len);
+    }
+
+    if !args.stdout {
+        eprintln!("Saved responses in {} directory", args.directory);
+    }
 
     Ok(())
 }
