@@ -2,7 +2,6 @@ use clap::Parser;
 use reqwest::Client;
 use sha2::{Digest, Sha256};
 use std::io::{self, BufRead};
-use std::os::unix::process;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 
