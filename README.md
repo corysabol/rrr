@@ -5,6 +5,7 @@
 </p>
 
 rrr is a CLI tool designed to fetch a bunch of URLs rapidly. That's pretty much it. It can save responses to files in a folder, or output them to STDOUT for piping.
+Inspired by [tomnomnom's fff](https://github.com/tomnomnom/fff).
 
 ## Features 🌟
 - **Custom HTTP Methods**: Choose the HTTP method for your requests.
