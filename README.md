@@ -38,6 +38,8 @@ rrr [OPTIONS]
     cat ranges.txt | daship | httpx | rrr -o | rg "hackme" > interesting.txt
     ```
 
+![rrr in action fetching the cloudflare top 100 domains with the help of the tool httpx.](./t-reg.gif)
+
 ## Get Started 🔥
 
 ### Install Prebuilt Binaries (recommended)
