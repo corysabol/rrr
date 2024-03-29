@@ -16,17 +16,25 @@ Inspired by [tomnomnom's fff](https://github.com/tomnomnom/fff).
 ## Usage 🛠
 
 ```
-rrr [OPTIONS]
+rrr (really rapid requesor) is a simple tool to rapidly request URLs.
+
+Usage: rrr [OPTIONS]
+
+Options:
+  -m, --method <METHOD>        Optional HTTP method to use for requests [default: GET]
+  -t, --timeout <TIMEOUT>      Request timeout value in milliseconds, e.g. 5000 = 5s [default: 5000]
+  -d, --directory <DIRECTORY>  Optional directory to save response bodies to [default: responses]
+  -i, --ignore <IGNORE>        Optional list of HTTP response status codes to ignore e.g. 404,403,500
+  -o, --stdout                 Print responses to STDOUT
+  -h, --help                   Print help
+  -V, --version                Print version
+
+Examples:
+    cat ranges.txt | httpx | rrr -d responses
+    cat urls.txt | rrr -i 404,403,500 -o > responses.txt
+    cat ranges.txt | daship | httpx | rrr -o | rg "hackme" > intersting.txt
+    echo 'https://foo.com' | rrr --timeout 1000
 ```
-
-### Options:
-
-- `-m, --method <METHOD>`: Optional HTTP method to use for requests. Default is `GET`.
-- `-d, --directory <DIRECTORY>`: Optional directory to save response bodies. Default is `responses`.
-- `-i, --ignore <IGNORE>`: Optional comma-separated list of HTTP response status codes to ignore (e.g., `404,403,500`).
-- `-o, --stdout`: Print response bodies to STDOUT instead of saving them.
-- `-h, --help`: Display help information.
-- `-V, --version`: Display the version number.
 
 ### Examples:
 
