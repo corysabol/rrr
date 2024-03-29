@@ -41,7 +41,6 @@ rrr [OPTIONS]
 ## Get Started 🔥
 
 ### Install Prebuilt Binaries (recommended)
-TODO: setup build and release github action.
 Grab the prebuilt binary for your OS from the [releases](https://github.com/corysabol/rrr/releases).
 
 ### Install From Source
