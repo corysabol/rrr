@@ -1,4 +1,5 @@
 use clap::Parser;
+use indicatif::ProgressBar;
 use reqwest::Client;
 use sha2::{Digest, Sha256};
 use std::io::{self, BufRead};
@@ -59,15 +60,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         //};
         let handle = tokio::spawn(async move {
             if let Err(e) = process_url(&client, &args, &ignore_codes, &url).await {
-                eprintln!("Error processing {}: {}", url, e);
+                //eprintln!("Error processing {}: {}", url, e);
             }
         });
         handles.push(handle);
     }
 
-    // await handles
-    // We don't really care about the results.
-    let _ = futures::future::join_all(handles).await;
+    let bar = ProgressBar::new(handles.len().try_into().unwrap());
+    for h in handles {
+        h.await?;
+        bar.inc(1);
+    }
+    bar.finish();
 
     Ok(())
 }
@@ -103,11 +107,11 @@ async fn process_url(
             Ok(url) => url.host_str().unwrap_or("").to_string(),
             Err(_) => "".to_string(),
         };
-        let filename = format!("{}-{}.sha256", host_name, hash_str);
+        let filename = format!("{}_{}.sha256", host_name, hash_str);
         let path = std::path::Path::new(&args.directory).join(filename);
         let mut file = File::create(&path).await?;
         file.write_all(body.as_bytes()).await?;
-        println!("Saved response to {:?}", path);
+        //println!("Saved response to {:?}", path);
     }
 
     Ok(())
