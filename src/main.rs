@@ -13,7 +13,7 @@ use tokio::io::AsyncWriteExt;
 #[command(
     author = "Cory Sabol",
     version = "0.1.0",
-    about = "rrr (really rapid requesor) is a simple too to rapidly request URLs.",
+    about = "rrr (really rapid requesor) is a simple tool to rapidly request URLs.",
     after_help = "Examples:
     cat ranges.txt | httpx | rrr -d responses 
     cat urls.txt | rrr -i 404,403,500 -o > responses.txt
